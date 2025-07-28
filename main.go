@@ -19,12 +19,17 @@ func typewriter(text string, delay time.Duration) {
 	fmt.Println()
 }
 
+type Character struct {
+	Name   string
+	Skills Skills
+}
+
 type Skills struct {
-	Scavenging    int
-	Medicine      int
-	Combat        int
-	Barter        int
-	Craftsmanship int
+	Scavenging int
+	Medicine   int
+	Combat     int
+	Barter     int
+	Crafting   int
 }
 
 func printAsciiArt(lines []string, delay time.Duration) {
@@ -73,7 +78,7 @@ func main() {
 func begin() {
 	var answer string
 	fmt.Print("\033[H\033[2J")
-	typewriter("The date is June 17th, 2034.", 50*time.Millisecond)
+	typewriter("The date is June 17th, 2054.", 50*time.Millisecond)
 	time.Sleep(750 * time.Millisecond)
 	typewriter("At least that's what we think.", 50*time.Millisecond)
 	time.Sleep(500 * time.Millisecond)
@@ -136,11 +141,11 @@ func clearScreen() {
 func char_creator() {
 	clearScreen()
 	skills := Skills{
-		Scavenging:    1,
-		Medicine:      1,
-		Combat:        1,
-		Barter:        1,
-		Craftsmanship: 1,
+		Scavenging: 1,
+		Medicine:   1,
+		Combat:     1,
+		Barter:     1,
+		Crafting:   1,
 	}
 
 	skillMap := map[int]string{
@@ -148,7 +153,7 @@ func char_creator() {
 		2: "Medicine",
 		3: "Combat",
 		4: "Barter",
-		5: "Craftsmanship",
+		5: "Crafting",
 	}
 
 	descriptions := map[int]string{
@@ -156,7 +161,7 @@ func char_creator() {
 		2: "Medicine increases your ability to heal and treat injuries.",
 		3: "Combat improves your fighting ability and accuracy.",
 		4: "Barter gives you better trade deals and influences people.",
-		5: "Craftsmanship allows you to craft more items and makes crafted items more durable",
+		5: "Crafting allows you to craft more items and makes crafted items more durable",
 	}
 
 	remainingPoints := 5
@@ -204,30 +209,37 @@ func char_creator() {
 	}
 
 	// Confirm final allocation
+	clearScreen()
 	fmt.Println("\nFinal Skill Levels:")
 	fmt.Printf("Scavenging: %d\n", skills.Scavenging)
 	fmt.Printf("Medicine:   %d\n", skills.Medicine)
 	fmt.Printf("Combat:     %d\n", skills.Combat)
 	fmt.Printf("Barter:     %d\n", skills.Barter)
-	fmt.Printf("Craftsmanship:   %d\n", skills.Craftsmanship)
+	fmt.Printf("Crafting:   %d\n", skills.Crafting)
 
 	reader = bufio.NewReader(os.Stdin)
 	for {
-		fmt.Print("Are you sure about your choices? THESE CHOICES CANT BE CHANGED [Y/N]: ")
+		fmt.Print("Are you sure about your choices? THIS CAN NOT BE CHANGED [Y/N]: ")
 		confirm, _ := reader.ReadString('\n')
 		confirm = strings.ToLower(strings.TrimSpace(confirm))
 		if confirm == "y" {
-			fmt.Println("Skills locked in. Starting game...")
-			break
+			fmt.Println("Skills locked in.")
+			time.Sleep(500 * time.Millisecond)
+			charName := name_char() // ✅ Get the name
+			fmt.Println("Hello,", charName)
+			time.Sleep(2000 * time.Millisecond)
+			chap1_1()
+
+			return
 		} else if confirm == "n" {
 			fmt.Println("Restarting allocation...")
+			time.Sleep(500 * time.Millisecond)
 			char_creator() // Restart allocation
 			return
 		} else {
 			fmt.Println("Please type 'y' or 'n'.")
 		}
 	}
-
 }
 
 func getSkillLevel(s Skills, skillID int) int {
@@ -241,7 +253,7 @@ func getSkillLevel(s Skills, skillID int) int {
 	case 4:
 		return s.Barter
 	case 5:
-		return s.Craftsmanship
+		return s.Crafting
 	}
 	return 0
 }
@@ -257,7 +269,7 @@ func addSkillPoints(s Skills, skillID int, points int) Skills {
 	case 4:
 		s.Barter += points
 	case 5:
-		s.Craftsmanship += points
+		s.Crafting += points
 	}
 	return s
 }
@@ -283,10 +295,33 @@ func GainSkillPoint(skills *Skills, skillName string) {
 			skills.Barter++
 			fmt.Println("Barter +1 (New level:", skills.Barter, ")")
 		}
-	case "Craftsmanship":
-		if skills.Craftsmanship < 5 {
-			skills.Craftsmanship++
-			fmt.Println("Craftsmanship +1 (New level:", skills.Craftsmanship, ")")
+	case "Crafting":
+		if skills.Crafting < 5 {
+			skills.Crafting++
+			fmt.Println("Crafting +1 (New level:", skills.Crafting, ")")
 		}
 	}
+}
+
+func name_char() string {
+	reader := bufio.NewReader(os.Stdin)
+	var name string
+	for {
+		clearScreen()
+		fmt.Println("====== NAME YOUR CHARACTER ======")
+		fmt.Print("Enter your character's name: ")
+		name, _ = reader.ReadString('\n')
+		name = strings.TrimSpace(name)
+		if name != "" {
+			break
+		}
+		fmt.Println("Name cannot be blank.")
+	}
+	return name
+}
+
+//CHAPTER 1
+
+func chap1_1() {
+
 }
