@@ -11,6 +11,13 @@ import (
 	"time"
 )
 
+var player Character
+
+type Choice struct {
+	Text   string
+	Action func()
+}
+
 func typewriter(text string, delay time.Duration) {
 	for _, char := range text {
 		fmt.Printf("%c", char)
@@ -38,9 +45,27 @@ func printAsciiArt(lines []string, delay time.Duration) {
 		time.Sleep(delay)
 	}
 }
+func presentChoices(prompt string, choices []Choice) {
+	fmt.Println("\n" + prompt)
+	for i, choice := range choices {
+		fmt.Printf("%d. %s\n", i+1, choice.Text)
+	}
+
+	var input int
+	for {
+		fmt.Print("Choose an option: ")
+		_, err := fmt.Scanln(&input)
+		if err == nil && input >= 1 && input <= len(choices) {
+			clearScreen()
+			choices[input-1].Action()
+			break
+		}
+		fmt.Println("Invalid input. Try again.")
+	}
+}
+
 func main() {
 	title := `
-
 ░██████╗██╗░██████╗░███╗░░██╗░█████╗░██╗░░░░░░░░█████╗░
 ██╔════╝██║██╔════╝░████╗░██║██╔══██╗██║░░░░░░░██╔══██╗
 ╚█████╗░██║██║░░██╗░██╔██╗██║███████║██║░░░░░░░██║░░██║
@@ -73,6 +98,7 @@ func main() {
 			fmt.Println("Invalid input. Please type Y or N.")
 		}
 	}
+
 }
 
 func begin() {
@@ -217,7 +243,6 @@ func char_creator() {
 	fmt.Printf("Barter:     %d\n", skills.Barter)
 	fmt.Printf("Crafting:   %d\n", skills.Crafting)
 
-	reader = bufio.NewReader(os.Stdin)
 	for {
 		fmt.Print("Are you sure about your choices? THIS CAN NOT BE CHANGED [Y/N]: ")
 		confirm, _ := reader.ReadString('\n')
@@ -225,8 +250,14 @@ func char_creator() {
 		if confirm == "y" {
 			fmt.Println("Skills locked in.")
 			time.Sleep(500 * time.Millisecond)
-			charName := name_char() // ✅ Get the name
-			fmt.Println("Hello,", charName)
+
+			// Get the name
+			player.Name = name_char()
+
+			// Assign skills to player
+			player.Skills = skills
+
+			fmt.Println("Hello,", player.Name)
 			time.Sleep(2000 * time.Millisecond)
 			chap1_1()
 
@@ -323,5 +354,154 @@ func name_char() string {
 //CHAPTER 1
 
 func chap1_1() {
+	chap1 := `
+╭━━━┳╮╱╭┳━━━┳━━━┳━━━━┳━━━┳━━━╮╱╭╮
+┃╭━╮┃┃╱┃┃╭━╮┃╭━╮┃╭╮╭╮┃╭━━┫╭━╮┃╭╯┃
+┃┃╱╰┫╰━╯┃┃╱┃┃╰━╯┣╯┃┃╰┫╰━━┫╰━╯┃╰╮┃
+┃┃╱╭┫╭━╮┃╰━╯┃╭━━╯╱┃┃╱┃╭━━┫╭╮╭╯╱┃┃
+┃╰━╯┃┃╱┃┃╭━╮┃┃╱╱╱╱┃┃╱┃╰━━┫┃┃╰╮╭╯╰╮
+╰━━━┻╯╱╰┻╯╱╰┻╯╱╱╱╱╰╯╱╰━━━┻╯╰━╯╰━━╯
+`
+
+	printAsciiArt(strings.Split(chap1, "\n"), 150*time.Millisecond)
+	time.Sleep(5 * time.Second)
+	clearScreen()
+	print("Silas: ")
+	typewriter("He said he would meet us here.", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	print("Silas: ")
+	typewriter("It's been like an hour.", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	typewriter("...", 2*time.Second)
+
+	print("Silas: ")
+	typewriter("Let's just leave.", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	println("A short, stocky man covered in dirt and grime walks in front of you and your brother.")
+
+	print("?: ")
+	typewriter("Hey Silas, what's goin' on, man?", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	print("Silas: ")
+	typewriter("I thought we were going to meet an hou—", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	print("?: ")
+	typewriter("Yo, who's this guy?", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	print("Silas: ")
+	typewriter("He's my brother. I told you he was coming.", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	print("Mason: ")
+	typewriter("Yo, what's up, lil' man? Name's Mason.", 50*time.Millisecond)
+	time.Sleep(1500 * time.Millisecond)
+
+	clearScreen()
+	presentChoices("The man extends his hand, covered in... well, you're not quite sure what, for a handshake.", []Choice{
+		{
+			Text: "Shake his hand",
+			Action: func() {
+				chap1_2()
+			},
+		},
+		{
+			Text: "Just tell him your name",
+			Action: func() {
+				chap1_3()
+			},
+		},
+	})
+}
+
+func chap1_2() {
+	clearScreen()
+	println("You shake his hand, and whatever was on it has now rubbed onto yours.")
+	print(player.Name + ": ")
+	typewriter("I'm "+player.Name+".", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	print("Mason: ")
+	typewriter("Nice meetin' you, man.", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	chap1_4()
+}
+func chap1_3() {
+	print(player.Name + ": ")
+	typewriter("I'm "+player.Name+".", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	println("Mason looks a little disappointed and embarrassed.")
+	time.Sleep(500 * time.Millisecond)
+
+	chap1_4()
+}
+
+func chap1_4() {
+	print("Silas: ")
+	typewriter("So, what's the plan?", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	print("Mason: ")
+	typewriter("I stole a key to the car garage. If we can get past the guard, we're in.", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	print("Silas: ")
+	typewriter("So, how do you recommend we do that?", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	println("Mason pulls a small revolver from his waistband.")
+	time.Sleep(500 * time.Millisecond)
+
+	print("Mason: ")
+	typewriter("Got this about two years ago.", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	print("Silas: ")
+	typewriter("We need to do this quietly. If you shoot that gun, we're not getting out.", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	print("Mason: ")
+	typewriter("Well, if you can find another way, let me know.", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	print("Silas: ")
+	typewriter("Fine. Let's go.", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	print("Mason: ")
+	typewriter("Hold on, man. You remember the deal, right? I'm coming with you guys.", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	print("Silas: ")
+	typewriter("Yeah, that's fine. Let's go.", 50*time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
+
+	var answer string
+	for {
+		fmt.Println("\nCONTINUE? [Y/N]")
+		fmt.Scanln(&answer)
+		answer = strings.TrimSpace(answer)
+
+		if strings.EqualFold(answer, "y") {
+			time.Sleep(3 * time.Second)
+			chap1_5()
+			break
+		} else if strings.EqualFold(answer, "n") {
+			fmt.Println("Exiting...")
+			break
+		} else {
+			fmt.Println("Invalid input. Please type Y or N.")
+		}
+	}
+}
+func chap1_5() {
+	clearScreen()
 
 }
